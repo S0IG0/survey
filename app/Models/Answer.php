@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property string $answer
  * @property int|mixed|string $surveys_id
+ * @property Survey|mixed $survey
+ * @method static findOrFail($id)
  */
 class Answer extends Model
 {
@@ -21,12 +24,19 @@ class Answer extends Model
      */
     protected $fillable = [
         'answer',
-        'surveys_id'
     ];
 
+    protected $hidden = [
+        'surveys_id'
+    ];
 
     public function survey(): BelongsTo
     {
         return $this->belongsTo(Survey::class, 'surveys_id');
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_answer');
     }
 }

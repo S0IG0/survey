@@ -24,14 +24,45 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // Matches "/api/login
     $router->post('login', 'AuthController@login');
 
-    // Matches "/api/profile
-    $router->get('profile', 'UserController@profile');
-    // Matches "/api/update-profile
-    $router->patch('update-profile', 'UserController@updateProfile');
 
-    $router->post('survey', 'SurveyController@createSurvey');
-    $router->patch('survey/{id}', 'SurveyController@updateSurvey');
-    $router->post('survey/{id}', 'SurveyController@activateSurvey');
-    $router->delete('survey/{id}', 'SurveyController@deleteSurvey');
-    $router->get('my-survey', 'SurveyController@mySurvey');
+    $router->get('profile',
+        ['middleware' => 'auth', 'uses' => 'UserController@profile']
+    );
+    $router->patch('update-profile',
+        ['middleware' => 'auth', 'uses' => 'UserController@updateProfile']
+    );
+
+
+    $router->get('all-survey', 'SurveyController@allSurvey');
+
+    $router->post('survey',
+        ['middleware' => 'auth', 'uses' => 'SurveyController@createSurvey']
+    );
+    $router->patch('survey/{id}',
+        ['middleware' => 'auth', 'uses' => 'SurveyController@updateSurvey']
+    );
+    $router->post('survey/{id}',
+        ['middleware' => 'auth', 'uses' => 'SurveyController@activateSurvey']
+    );
+    $router->delete('survey/{id}',
+        ['middleware' => 'auth', 'uses' => 'SurveyController@deleteSurvey']
+    );
+    $router->get('my-survey',
+        ['middleware' => 'auth', 'uses' => 'SurveyController@mySurvey']
+    );
+    $router->post('add-answer-to-survey/{id}',
+        ['middleware' => 'auth', 'uses' => 'SurveyController@addAnswerToSurvey']
+    );
+
+
+    $router->delete('answer/{id}',
+        ['middleware' => 'auth', 'uses' => 'AnswerController@deleteAnswer']
+    );
+    $router->patch('answer/{id}',
+        ['middleware' => 'auth', 'uses' => 'AnswerController@updateAnswer']
+    );
+
+    $router->post('choose-answer/{id}',
+        ['middleware' => 'auth', 'uses' => 'AnswerController@chooseAnswer']
+    );
 });

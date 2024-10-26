@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\Survey;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,16 +12,6 @@ use Illuminate\Validation\ValidationException;
 
 class SurveyController extends Controller
 {
-    /**
-     * Instantiate a new UserController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     /**
      * @throws ValidationException
      */
@@ -107,7 +98,7 @@ class SurveyController extends Controller
     public function activateSurvey($id): JsonResponse
     {
         try {
-            $survey = Survey::findOrFail($id);
+            $survey = Survey::with('answers')->findOrFail($id);
         } catch (\Exception $exception) {
             return response()->json(['message' => 'Survey Not Found!'], 404);
         }
@@ -145,9 +136,46 @@ class SurveyController extends Controller
         return response()->json(null, 204);
     }
 
-    public function mySurvey(): JsonResponse
+    public function mySurvey(Request $request): JsonResponse
     {
-        $surveys = Survey::with('answers')->where('owner_id', Auth::id())->get();
+        $perPage = $request->input('per_page', 10);
+        $surveys = Survey::with('answers')->where('owner_id', Auth::id())->paginate($perPage);
         return response()->json($surveys, 200);
+    }
+
+    public function allSurvey(Request $request): JsonResponse
+    {
+        $perPage = $request->input('per_page', 10);
+        $surveys = Survey::with('answers')->paginate($perPage);
+        return response()->json($surveys, 200);
+    }
+
+
+    /**
+     * @throws ValidationException
+     */
+    public function addAnswerToSurvey($id, Request $request): JsonResponse
+    {
+        try {
+            $survey = Survey::with('answers')->findOrFail($id);
+        } catch (\Exception $exception) {
+            return response()->json(['message' => 'Survey Not Found!'], 404);
+        }
+
+        if ($survey->owner_id !== Auth::id()) {
+            return response()->json(['message' => 'Survey Not Authorized!'], 403);
+        }
+
+        $this->validate($request, [
+            'answer' => 'required|string|min:6',
+        ]);
+
+        $answer = new Answer();
+        $answer->answer = $request->input('answer');
+        $answer->surveys_id = $survey->id;
+        $survey->answers()->save($answer);
+        $survey->load('answers');
+
+        return response()->json($survey, 200);
     }
 }

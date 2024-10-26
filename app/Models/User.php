@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -14,6 +15,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $name
  * @property string $email
  * @property string $password
+ * @method static find(int|string|null $id)
  */
 class User extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
@@ -55,5 +57,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    public function answers(): BelongsToMany
+    {
+        return $this->belongsToMany(Answer::class, 'user_answer');
     }
 }
