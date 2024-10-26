@@ -55,4 +55,15 @@ class UserController extends Controller
         $user->save();
         return response()->json($user, 200);
     }
+
+    public function myAnswers(Request $request): JsonResponse
+    {
+        $perPage = $request->input('per_page', 10);
+        $answers = Auth::user()->answers()->with('survey')->paginate($perPage);
+        $answers->getCollection()->transform(function ($answer) {
+            $answer->survey_id = $answer->survey->id;
+            return $answer->makeHidden(['pivot', 'survey']);
+        });
+        return response()->json($answers, 200);
+    }
 }

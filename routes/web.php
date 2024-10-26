@@ -31,6 +31,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->patch('update-profile',
         ['middleware' => 'auth', 'uses' => 'UserController@updateProfile']
     );
+    $router->get('my-answers',
+        ['middleware' => 'auth', 'uses' => 'UserController@myAnswers']
+    );
 
 
     $router->get('all-survey', 'SurveyController@allSurvey');
