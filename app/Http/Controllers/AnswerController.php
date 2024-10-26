@@ -112,4 +112,31 @@ class AnswerController extends Controller
         ], 200);
     }
 
+    public function cancelChooseAnswer($id): JsonResponse
+    {
+        try {
+            $answer = Answer::with('survey')->findOrFail($id);
+            $survey = $answer->survey;
+        } catch (\Exception $exception) {
+            return response()->json([
+                'message' => 'Answer Not Found!',
+            ], 404);
+        }
+
+        if (!$survey->is_activated) {
+            return response()->json(['message' => 'Survey is not active, wait for it to be activated'], 409);
+        }
+
+        $user = User::find(Auth::id());
+        $answerExists = $user->answers()->where('answer_id', $id)->exists();
+
+        if (!$answerExists) {
+            return response()->json(['message' => 'Answer is not selected!'], 409);
+        }
+
+        $user->answers()->detach($id);
+
+        return response()->json(null, 204);
+    }
+
 }

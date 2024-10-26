@@ -65,4 +65,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('choose-answer/{id}',
         ['middleware' => 'auth', 'uses' => 'AnswerController@chooseAnswer']
     );
+    $router->delete('choose-answer/{id}',
+        ['middleware' => 'auth', 'uses' => 'AnswerController@cancelChooseAnswer']
+    );
 });
