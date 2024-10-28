@@ -21,5 +21,16 @@ services:
     ports:
       - "8080:8080"
 
+  php-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - database-postgresql
+    ports:
+      - "8000:8000"
+    command: sh -c "php artisan migrate && php -S 0.0.0.0:8000 -t public"
+
 volumes:
   postgresql-data:
