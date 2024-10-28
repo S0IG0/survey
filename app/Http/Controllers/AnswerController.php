@@ -139,4 +139,26 @@ class AnswerController extends Controller
         return response()->json(null, 204);
     }
 
+    public function usersChoseAnswer($id, Request $request): JsonResponse
+    {
+        $perPage = $request->input('per_page', 10);
+
+        // Находим ответ с переданным id и загружаем связанный опрос
+        $answer = Answer::with('survey')->findOrFail($id);
+
+        // Проверяем, является ли опрос анонимным
+        if ($answer->survey->is_anonymous) {
+            return response()->json([
+                'message' => 'User information cannot be viewed because the survey is anonymous.'
+            ], 403);
+        }
+
+        $users = $answer->users()->paginate($perPage);
+        $users->getCollection()->each(function ($user) {
+            unset($user->pivot);
+        });
+
+        return response()->json($users, 200);
+    }
+
 }

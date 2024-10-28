@@ -139,14 +139,19 @@ class SurveyController extends Controller
     public function mySurvey(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 10);
-        $surveys = Survey::with('answers')->where('owner_id', Auth::id())->paginate($perPage);
+        $surveys = Survey::with(['answers' => function ($query) {
+            $query->withCount('users');
+        }])->where('owner_id', Auth::id())->paginate($perPage);
+
         return response()->json($surveys, 200);
     }
 
     public function allSurvey(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 10);
-        $surveys = Survey::with('answers')->paginate($perPage);
+        $surveys = Survey::with(['answers' => function ($query) {
+            $query->withCount('users');
+        }])->paginate($perPage);
         return response()->json($surveys, 200);
     }
 

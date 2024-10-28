@@ -71,4 +71,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->delete('choose-answer/{id}',
         ['middleware' => 'auth', 'uses' => 'AnswerController@cancelChooseAnswer']
     );
+
+
+    $router->get('users-chose-answer/{id}',
+        ['middleware' => 'auth', 'uses' => 'AnswerController@usersChoseAnswer']
+    );
 });
